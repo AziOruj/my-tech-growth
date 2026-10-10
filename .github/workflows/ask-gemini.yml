@@ -30,10 +30,9 @@ jobs:
            contains(github.event.issue.labels.*.name, 'daily')))
       )
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 10
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      GEMINI_CLI_TRUST_WORKSPACE: "true"   # headless CI: Gemini CLI qovluğa etibar etsin
       ISSUE: ${{ github.event.issue.number }}
     steps:
       - uses: actions/checkout@v6.1.0
@@ -55,38 +54,21 @@ jobs:
             echo
             gh issue view "$ISSUE" --json comments \
               -q '.comments[] | "\n---\n**\(.author.login)**:\n\(.body)"'
-          } > .thread.md
+          } > "$RUNNER_TEMP/thread.md"
 
-      - name: Gemini
-        id: gemini
-        uses: google-github-actions/run-gemini-cli@f77273f4c914e4bf38440cf36a0369cb64a37489 # v0.1.22
+      - uses: actions/setup-node@v7.1.0
         with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_model: gemini-3.8-flash
-          prompt: |
-            Sən bu repo-dakı gündəlik AI-in-Java öyrənmə jurnalının mentorusan.
-            Əvvəlcə CLAUDE.md-ni oxu — rolun, mövzu sahən və qaydaların oradadır.
-            Sonra .thread.md faylını oxu: bu, istifadəçi ilə söhbətin tarixçəsidir.
-            İstifadəçinin (AziOruj) ən sonuncu mesajına cavab ver. Issue gündəlik mövzu
-            haqqındadırsa, əvvəlcə issue-da link verilmiş daily/ faylını oxu.
+          node-version: 22
 
-            Mesajın növünü müəyyən et:
-            - SUAL (izah, misal, quiz, tapşırığın yoxlanması): yalnız cavab ver, fayllara toxunma.
-            - DÜZƏLİŞ İSTƏYİ ("düzəlt", "əlavə et", "dəyiş", "sil", "qayda kimi yaz"):
-              yalnız daily/, topics.md və ya CLAUDE.md fayllarını dəyiş. Gələcək günlərə aid
-              üslub istəkləri CLAUDE.md-yə qayda kimi yazılır.
-              Cavabın sonunda hansı faylda nəyi dəyişdiyini qısa siyahı ilə yaz.
-
-            Qaydalar: Azərbaycan dilində cavab ver, texniki terminlər ingiliscə.
-            Yalnız Java nümunələri. Versiya/API iddialarını lazım olduqda google_web_search ilə yoxla.
-            git əmrləri işlətmə. .thread.md faylını dəyişmə.
-            Son cavabın birbaşa GitHub şərhi kimi dərc olunacaq — markdown istifadə et.
+      - name: Gemini (1 API sorğusu)
+        timeout-minutes: 6
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node .github/scripts/gemini.mjs ask "$RUNNER_TEMP/thread.md" "$RUNNER_TEMP/reply.md"
 
       - name: Dəyişiklikləri push et
         id: push
         run: |
-          rm -f .thread.md
-          rm -rf .gemini
           git add -A daily/ topics.md CLAUDE.md
           if git diff --cached --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -102,24 +84,15 @@ jobs:
       - name: Cavabı issue-ya yaz
         if: always()
         env:
-          SUMMARY: ${{ steps.gemini.outputs.summary }}
-          ERROR: ${{ steps.gemini.outputs.error }}
           CHANGED: ${{ steps.push.outputs.changed }}
           SHA: ${{ steps.push.outputs.sha }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          {
-            if [ -n "$SUMMARY" ]; then
-              printf '%s\n' "$SUMMARY"
-            else
-              echo "⚠️ Gemini cavab qaytarmadı. ${ERROR}"
-              echo
-              echo "Run log: $RUN_URL"
-            fi
-            if [ "$CHANGED" = "true" ]; then
-              echo
-              echo "---"
-              echo "✅ Dəyişiklik main-ə push olundu: \`$SHA\`"
-            fi
-          } > reply.md
-          gh issue comment "$ISSUE" --body-file reply.md
+          REPLY="$RUNNER_TEMP/reply.md"
+          if [ ! -s "$REPLY" ]; then
+            printf '⚠️ Cavab hazırlanmadı. Run log: %s\n' "$RUN_URL" > "$REPLY"
+          fi
+          if [ "$CHANGED" = "true" ]; then
+            printf '\n---\n✅ Dəyişiklik main-ə push olundu: `%s`\n' "$SHA" >> "$REPLY"
+          fi
+          gh issue comment "$ISSUE" --body-file "$REPLY"

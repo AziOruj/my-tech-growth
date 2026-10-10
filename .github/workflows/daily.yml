@@ -21,9 +21,7 @@ concurrency:
 jobs:
   daily:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    env:
-      GEMINI_CLI_TRUST_WORKSPACE: "true"   # headless CI: Gemini CLI qovluğa etibar etsin
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6.1.0
 
@@ -42,30 +40,17 @@ jobs:
             echo "exists=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Gemini CLI ilə günün mövzusunu yarat
+      - uses: actions/setup-node@v7.1.0
         if: steps.day.outputs.exists == 'false'
-        uses: google-github-actions/run-gemini-cli@f77273f4c914e4bf38440cf36a0369cb64a37489 # v0.1.22
         with:
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_model: gemini-3.8-flash
-          prompt: |
-            Sən bu repo-dasan: Java backend Tech Lead üçün gündəlik AI-in-Java öyrənmə jurnalı.
-            Bugünkü tarix: ${{ steps.day.outputs.date }}
+          node-version: 22
 
-            1. CLAUDE.md faylını tam oxu. Oradakı rol, mövzu sahəsi, gündəlik iş axını,
-               fayl strukturu və qaydalar sənin təlimatındır — dəqiq əməl et.
-            2. topics.md-ni oxu, keçilmiş mövzuları təkrarlama, CLAUDE.md-dəki yol xəritəsinə
-               uyğun növbəti mövzunu seç. Nümunə üçün daily/ qovluğundakı mövcud faylın
-               üslubuna və dərinliyinə bax.
-            3. Kitabxana versiyalarını və API-ləri google_web_search və web_fetch ilə rəsmi
-               mənbələrdən yoxla (docs.spring.io, docs.langchain4j.dev, GitHub releases).
-               Uydurma API yazma; əmin olmadığın metodu istifadə etmə və ya açıq qeyd et.
-            4. daily/${{ steps.day.outputs.date }}-<movzu-adi>.md faylını yarat
-               (kebab-case, ASCII ad; Azərbaycan dilində; texniki terminlər ingiliscə;
-               10-15 dəqiqəlik oxu; yalnız Java nümunələri).
-            5. topics.md cədvəlinə yeni sətir əlavə et (Fayl sütununda nisbi markdown link).
-            6. git əmrləri İŞLƏTMƏ — commit və push-u workflow özü edir.
-               Başqa fayllara toxunma.
+      - name: Gemini ilə günün mövzusunu yarat (1 API sorğusu)
+        if: steps.day.outputs.exists == 'false'
+        timeout-minutes: 6
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: node .github/scripts/gemini.mjs daily "${{ steps.day.outputs.date }}"
 
       - name: Nəticəni yoxla
         if: steps.day.outputs.exists == 'false'
@@ -77,7 +62,6 @@ jobs:
       - name: Commit və push
         if: steps.day.outputs.exists == 'false'
         run: |
-          rm -rf .gemini
           git config user.name "AziOruj"
           git config user.email "85117267+AziOruj@users.noreply.github.com"
           git add daily/ topics.md
