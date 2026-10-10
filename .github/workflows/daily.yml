@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: daily
@@ -81,3 +82,27 @@ jobs:
           TITLE=$(basename daily/${{ steps.day.outputs.date }}-*.md .md)
           git commit -m "daily: $TITLE"
           git push origin HEAD:main
+
+      - name: Müzakirə issue-su aç
+        if: steps.day.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DAY: ${{ steps.day.outputs.date }}
+        run: |
+          FILE=$(ls daily/"$DAY"-*.md | head -1)
+          TOPIC=$(grep -m1 '^# ' "$FILE" | sed 's/^# //')
+          URL="${{ github.server_url }}/${{ github.repository }}/blob/main/$FILE"
+          gh label create daily --color 1D76DB --description "Gündəlik mövzu müzakirəsi" --force >/dev/null
+          {
+            echo "📖 **Bugünkü mövzu:** [$TOPIC]($URL)"
+            echo
+            echo "Bu issue-da yazdığın hər şərhə Gemini cavab verir (\`@gemini\` yazmaq lazım deyil)."
+            echo
+            echo "- Sual: _\"X-i sadə misalla izah et\"_"
+            echo "- Tapşırıq: _\"Tapşırığı belə etdim: ... yoxla\"_"
+            echo "- Düzəliş: _\"Faylda Y bölməsinə Z əlavə et\"_"
+            echo "- Qayda: _\"Qayda kimi yaz: hər gün quiz olsun\"_"
+            echo
+            echo "Bitirəndə issue-nu bağla."
+          } > issue.md
+          gh issue create --title "📚 $DAY — $TOPIC" --label daily --body-file issue.md

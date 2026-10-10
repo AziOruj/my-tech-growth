@@ -19,12 +19,15 @@ concurrency:
 
 jobs:
   ask:
-    # Yalnız repo sahibi və yalnız "@gemini" olduqda; botun öz şərhlərinə reaksiya vermir
+    # Yalnız repo sahibi; "@gemini" qeyd olunanda və ya "daily" issue-sundakı hər şərhdə.
+    # Botun öz şərhlərinə reaksiya vermir (actor github-actions olur).
     if: >-
       github.actor == 'AziOruj' &&
       (
         (github.event_name == 'issues' && contains(github.event.issue.body, '@gemini')) ||
-        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@gemini'))
+        (github.event_name == 'issue_comment' &&
+          (contains(github.event.comment.body, '@gemini') ||
+           contains(github.event.issue.labels.*.name, 'daily')))
       )
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -63,7 +66,8 @@ jobs:
             Sən bu repo-dakı gündəlik AI-in-Java öyrənmə jurnalının mentorusan.
             Əvvəlcə CLAUDE.md-ni oxu — rolun, mövzu sahən və qaydaların oradadır.
             Sonra .thread.md faylını oxu: bu, istifadəçi ilə söhbətin tarixçəsidir.
-            Ən sonuncu "@gemini" olan mesaja cavab ver.
+            İstifadəçinin (AziOruj) ən sonuncu mesajına cavab ver. Issue gündəlik mövzu
+            haqqındadırsa, əvvəlcə issue-da link verilmiş daily/ faylını oxu.
 
             Mesajın növünü müəyyən et:
             - SUAL (izah, misal, quiz, tapşırığın yoxlanması): yalnız cavab ver, fayllara toxunma.
