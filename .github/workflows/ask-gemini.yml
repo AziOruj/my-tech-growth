@@ -1,0 +1,120 @@
+name: ask-gemini
+
+# Telefondan söhbət: issue açıb və ya şərh yazıb mətndə "@gemini" qeyd et.
+# Sual → cavab issue-ya yazılır. Düzəliş istəyi → fayl dəyişdirilir, main-ə push olunur.
+
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: ask-gemini-${{ github.event.issue.number }}
+  cancel-in-progress: false
+
+jobs:
+  ask:
+    # Yalnız repo sahibi və yalnız "@gemini" olduqda; botun öz şərhlərinə reaksiya vermir
+    if: >-
+      github.actor == 'AziOruj' &&
+      (
+        (github.event_name == 'issues' && contains(github.event.issue.body, '@gemini')) ||
+        (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@gemini'))
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ISSUE: ${{ github.event.issue.number }}
+    steps:
+      - uses: actions/checkout@v6.1.0
+
+      - name: "👀 reaksiyası (qəbul edildi)"
+        run: |
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            gh api -X POST "repos/${{ github.repository }}/issues/comments/${{ github.event.comment.id }}/reactions" -f content=eyes >/dev/null
+          else
+            gh api -X POST "repos/${{ github.repository }}/issues/$ISSUE/reactions" -f content=eyes >/dev/null
+          fi
+
+      - name: Söhbət tarixçəsini topla
+        run: |
+          {
+            echo "# Issue #$ISSUE: $(gh issue view "$ISSUE" --json title -q .title)"
+            echo
+            gh issue view "$ISSUE" --json body -q .body
+            echo
+            gh issue view "$ISSUE" --json comments \
+              -q '.comments[] | "\n---\n**\(.author.login)**:\n\(.body)"'
+          } > .thread.md
+
+      - name: Gemini
+        id: gemini
+        uses: google-github-actions/run-gemini-cli@f77273f4c914e4bf38440cf36a0369cb64a37489 # v0.1.22
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_model: gemini-2.5-flash
+          prompt: |
+            Sən bu repo-dakı gündəlik AI-in-Java öyrənmə jurnalının mentorusan.
+            Əvvəlcə CLAUDE.md-ni oxu — rolun, mövzu sahən və qaydaların oradadır.
+            Sonra .thread.md faylını oxu: bu, istifadəçi ilə söhbətin tarixçəsidir.
+            Ən sonuncu "@gemini" olan mesaja cavab ver.
+
+            Mesajın növünü müəyyən et:
+            - SUAL (izah, misal, quiz, tapşırığın yoxlanması): yalnız cavab ver, fayllara toxunma.
+            - DÜZƏLİŞ İSTƏYİ ("düzəlt", "əlavə et", "dəyiş", "sil", "qayda kimi yaz"):
+              yalnız daily/, topics.md və ya CLAUDE.md fayllarını dəyiş. Gələcək günlərə aid
+              üslub istəkləri CLAUDE.md-yə qayda kimi yazılır.
+              Cavabın sonunda hansı faylda nəyi dəyişdiyini qısa siyahı ilə yaz.
+
+            Qaydalar: Azərbaycan dilində cavab ver, texniki terminlər ingiliscə.
+            Yalnız Java nümunələri. Versiya/API iddialarını lazım olduqda google_web_search ilə yoxla.
+            git əmrləri işlətmə. .thread.md faylını dəyişmə.
+            Son cavabın birbaşa GitHub şərhi kimi dərc olunacaq — markdown istifadə et.
+
+      - name: Dəyişiklikləri push et
+        id: push
+        run: |
+          rm -f .thread.md
+          rm -rf .gemini
+          git add -A daily/ topics.md CLAUDE.md
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            git config user.name "AziOruj"
+            git config user.email "85117267+AziOruj@users.noreply.github.com"
+            git commit -m "edit via issue #$ISSUE"
+            git push origin HEAD:main
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Cavabı issue-ya yaz
+        if: always()
+        env:
+          SUMMARY: ${{ steps.gemini.outputs.summary }}
+          ERROR: ${{ steps.gemini.outputs.error }}
+          CHANGED: ${{ steps.push.outputs.changed }}
+          SHA: ${{ steps.push.outputs.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          {
+            if [ -n "$SUMMARY" ]; then
+              printf '%s\n' "$SUMMARY"
+            else
+              echo "⚠️ Gemini cavab qaytarmadı. ${ERROR}"
+              echo
+              echo "Run log: $RUN_URL"
+            fi
+            if [ "$CHANGED" = "true" ]; then
+              echo
+              echo "---"
+              echo "✅ Dəyişiklik main-ə push olundu: \`$SHA\`"
+            fi
+          } > reply.md
+          gh issue comment "$ISSUE" --body-file reply.md
