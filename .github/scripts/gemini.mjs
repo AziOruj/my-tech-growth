@@ -23,12 +23,13 @@ function fail(msg) {
   process.exit(1);
 }
 
-// Pulsuz tier-də Google Search grounding-in kvotası olmaya bilər (429), ona görə
-// eyni modeli axtarışsız da sınayırıq. Interactions API alınmasa — klassik generateContent.
+// Pulsuz tier-də Google Search grounding-in kvotası yoxdur (2026-10-11 yoxlanılıb: həmişə 429).
+// Billing qoşulsa GEMINI_SEARCH=true ilə yenidən aktivləşdirmək olar.
+// Interactions API alınmasa — klassik generateContent.
 function attempts() {
   const [first, ...others] = MODELS;
   return [
-    { api: "interactions", model: first, search: true },
+    ...(process.env.GEMINI_SEARCH === "true" ? [{ api: "interactions", model: first, search: true }] : []),
     { api: "interactions", model: first, search: false },
     { api: "generateContent", model: first, search: false },
     ...others.map((model) => ({ api: "generateContent", model, search: false })),
@@ -131,7 +132,7 @@ if (mode === "daily") {
 
 ---
 Sən bu təlimatlara əməl edən mentorsan. Repo fayllarına birbaşa girişin yoxdur — lazım olan
-hər şey aşağıda verilib. Versiya və API-ləri google_search ilə rəsmi mənbələrdən yoxla.
+hər şey aşağıda verilib. Versiya və API-lər üçün yalnız əmin olduğun məlumatı yaz.
 
 CAVAB FORMATI (dəqiq belə, başqa heç nə yazma):
 SLUG: <ascii-kebab-case-movzu-adi>
@@ -189,7 +190,7 @@ Növbəti mövzunu seç və həmin formatda gündəlik faylı yaz.`;
 ---
 Sən GitHub issue-da istifadəçi (AziOruj) ilə danışan mentorsan. Cavabın birbaşa GitHub şərhi kimi
 dərc olunur — markdown istifadə et. Azərbaycan dilində, texniki terminlər ingiliscə, yalnız Java.
-Versiya/API iddialarını lazım olduqda google_search ilə yoxla.
+Versiya/API iddialarında əmin deyilsənsə, bunu açıq de.
 
 İstifadəçinin ƏN SONUNCU mesajına cavab ver.
 - SUAL (izah, misal, quiz, tapşırığın yoxlanması): sadəcə cavab yaz.
