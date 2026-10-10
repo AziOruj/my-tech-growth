@@ -4,6 +4,11 @@ on:
   schedule:
     - cron: "0 4 * * *"   # hər gün 08:00 Asia/Baku (04:00 UTC); GitHub cron 5-30 dəq gecikə bilər
   workflow_dispatch:       # əl ilə işə salmaq üçün (Actions tab → Run workflow)
+    inputs:
+      date:
+        description: "Tarix (YYYY-MM-DD). Boş = bu gün (Asia/Baku)"
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -21,8 +26,11 @@ jobs:
 
       - name: Bugünkü tarix və təkrar yoxlaması
         id: day
+        env:
+          INPUT_DATE: ${{ inputs.date }}
         run: |
-          DAY=$(TZ=Asia/Baku date +%F)
+          DAY=${INPUT_DATE:-$(TZ=Asia/Baku date +%F)}
+          [[ "$DAY" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]] || { echo "::error::Tarix formatı səhvdir: $DAY"; exit 1; }
           echo "date=$DAY" >> "$GITHUB_OUTPUT"
           if ls daily/"$DAY"-*.md >/dev/null 2>&1; then
             echo "exists=true" >> "$GITHUB_OUTPUT"
