@@ -62,7 +62,7 @@ jobs:
         uses: google-github-actions/run-gemini-cli@f77273f4c914e4bf38440cf36a0369cb64a37489 # v0.1.22
         with:
           gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
-          gemini_model: gemini-2.5-flash
+          gemini_model: gemini-3.8-flash
           prompt: |
             Sən bu repo-dakı gündəlik AI-in-Java öyrənmə jurnalının mentorusan.
             Əvvəlcə CLAUDE.md-ni oxu — rolun, mövzu sahən və qaydaların oradadır.
