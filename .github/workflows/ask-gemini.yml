@@ -24,9 +24,9 @@ jobs:
     if: >-
       github.actor == 'AziOruj' &&
       (
-        (github.event_name == 'issues' && contains(github.event.issue.body, '@gemini')) ||
+        (github.event_name == 'issues' && (contains(github.event.issue.body, '@gemini') || contains(github.event.issue.title, '@gemini') || contains(github.event.issue.body, '/gemini') || contains(github.event.issue.title, '/gemini'))) ||
         (github.event_name == 'issue_comment' &&
-          (contains(github.event.comment.body, '@gemini') ||
+          (contains(github.event.comment.body, '@gemini') || contains(github.event.comment.body, '/gemini') ||
            contains(github.event.issue.labels.*.name, 'daily')))
       )
     runs-on: ubuntu-latest
