@@ -1,0 +1,75 @@
+name: daily-ai-java-mentor
+
+on:
+  schedule:
+    - cron: "0 4 * * *"   # hər gün 08:00 Asia/Baku (04:00 UTC); GitHub cron 5-30 dəq gecikə bilər
+  workflow_dispatch:       # əl ilə işə salmaq üçün (Actions tab → Run workflow)
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily
+  cancel-in-progress: false
+
+jobs:
+  daily:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v6.1.0
+
+      - name: Bugünkü tarix və təkrar yoxlaması
+        id: day
+        run: |
+          DAY=$(TZ=Asia/Baku date +%F)
+          echo "date=$DAY" >> "$GITHUB_OUTPUT"
+          if ls daily/"$DAY"-*.md >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::$DAY üçün fayl artıq var, keçilir."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Gemini CLI ilə günün mövzusunu yarat
+        if: steps.day.outputs.exists == 'false'
+        uses: google-github-actions/run-gemini-cli@f77273f4c914e4bf38440cf36a0369cb64a37489 # v0.1.22
+        with:
+          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+          gemini_model: gemini-2.5-flash
+          prompt: |
+            Sən bu repo-dasan: Java backend Tech Lead üçün gündəlik AI-in-Java öyrənmə jurnalı.
+            Bugünkü tarix: ${{ steps.day.outputs.date }}
+
+            1. CLAUDE.md faylını tam oxu. Oradakı rol, mövzu sahəsi, gündəlik iş axını,
+               fayl strukturu və qaydalar sənin təlimatındır — dəqiq əməl et.
+            2. topics.md-ni oxu, keçilmiş mövzuları təkrarlama, CLAUDE.md-dəki yol xəritəsinə
+               uyğun növbəti mövzunu seç. Nümunə üçün daily/ qovluğundakı mövcud faylın
+               üslubuna və dərinliyinə bax.
+            3. Kitabxana versiyalarını və API-ləri google_web_search və web_fetch ilə rəsmi
+               mənbələrdən yoxla (docs.spring.io, docs.langchain4j.dev, GitHub releases).
+               Uydurma API yazma; əmin olmadığın metodu istifadə etmə və ya açıq qeyd et.
+            4. daily/${{ steps.day.outputs.date }}-<movzu-adi>.md faylını yarat
+               (kebab-case, ASCII ad; Azərbaycan dilində; texniki terminlər ingiliscə;
+               10-15 dəqiqəlik oxu; yalnız Java nümunələri).
+            5. topics.md cədvəlinə yeni sətir əlavə et (Fayl sütununda nisbi markdown link).
+            6. git əmrləri İŞLƏTMƏ — commit və push-u workflow özü edir.
+               Başqa fayllara toxunma.
+
+      - name: Nəticəni yoxla
+        if: steps.day.outputs.exists == 'false'
+        run: |
+          DAY=${{ steps.day.outputs.date }}
+          ls daily/"$DAY"-*.md >/dev/null 2>&1 || { echo "::error::Gündəlik fayl yaradılmadı"; exit 1; }
+          grep -q "$DAY" topics.md || { echo "::error::topics.md yenilənmədi"; exit 1; }
+
+      - name: Commit və push
+        if: steps.day.outputs.exists == 'false'
+        run: |
+          rm -rf .gemini
+          git config user.name "AziOruj"
+          git config user.email "85117267+AziOruj@users.noreply.github.com"
+          git add daily/ topics.md
+          TITLE=$(basename daily/${{ steps.day.outputs.date }}-*.md .md)
+          git commit -m "daily: $TITLE"
+          git push origin HEAD:main
