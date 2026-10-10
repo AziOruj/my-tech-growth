@@ -23,47 +23,97 @@ function fail(msg) {
   process.exit(1);
 }
 
-async function ask({ system, input, thinking, maxTokens }) {
-  const errors = [];
-  for (const model of MODELS) {
-    let res;
-    try {
-      res = await fetch(API, {
-        method: "POST",
-        headers: { "x-goog-api-key": key, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model,
-          system_instruction: system,
-          input,
-          tools: [{ type: "google_search" }],
-          generation_config: { thinking_level: thinking, max_output_tokens: maxTokens },
-          store: false,
-        }),
-        signal: AbortSignal.timeout(TIMEOUT_MS),
-      });
-    } catch (e) {
-      errors.push(`${model}: ${e.name === "TimeoutError" ? "timeout" : e.message}`);
-      continue;
-    }
-    const body = await res.text();
-    if (!res.ok) {
-      errors.push(`${model}: HTTP ${res.status} ${body.slice(0, 300)}`);
-      if ([404, 429, 500, 503].includes(res.status)) continue; // növbəti model
-      break; // 400/401/403 — digər modellər də eyni xətanı verəcək
-    }
-    const data = JSON.parse(body);
-    const text = (data.steps ?? [])
+// Pulsuz tier-də Google Search grounding-in kvotası olmaya bilər (429), ona görə
+// eyni modeli axtarışsız da sınayırıq. Interactions API alınmasa — klassik generateContent.
+function attempts() {
+  const [first, ...others] = MODELS;
+  return [
+    { api: "interactions", model: first, search: true },
+    { api: "interactions", model: first, search: false },
+    { api: "generateContent", model: first, search: false },
+    ...others.map((model) => ({ api: "generateContent", model, search: false })),
+  ];
+}
+
+const NO_SEARCH_NOTE = `
+
+QEYD: Bu sorğuda internet axtarışı YOXDUR. Versiya nömrələrini bildiyin ən son məlumata görə yaz,
+amma hər birinin yanında "(yoxlanılmalıdır)" qeyd et və Mənbələr bölməsində rəsmi linkləri ver.`;
+
+function buildRequest({ api, model, search }, { system: baseSystem, input, thinking, maxTokens }) {
+  const system = search ? baseSystem : baseSystem + NO_SEARCH_NOTE;
+  if (api === "interactions") {
+    return {
+      url: API,
+      body: {
+        model,
+        system_instruction: system,
+        input,
+        ...(search && { tools: [{ type: "google_search" }] }),
+        generation_config: { thinking_level: thinking, max_output_tokens: maxTokens },
+        store: false,
+      },
+    };
+  }
+  return {
+    url: `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`,
+    body: {
+      systemInstruction: { parts: [{ text: system }] },
+      contents: [{ role: "user", parts: [{ text: input }] }],
+      generationConfig: { maxOutputTokens: maxTokens },
+    },
+  };
+}
+
+function extractText(api, data) {
+  if (api === "interactions") {
+    if (data.status !== "completed") return "";
+    return (data.steps ?? [])
       .filter((s) => s.type === "model_output")
       .flatMap((s) => s.content ?? [])
       .filter((c) => c.type === "text")
       .map((c) => c.text)
       .join("");
-    if (data.status !== "completed" || !text.trim()) {
-      errors.push(`${model}: status=${data.status}, mətn ${text.trim() ? "var" : "yoxdur"}`);
+  }
+  return (data.candidates?.[0]?.content?.parts ?? [])
+    .filter((p) => !p.thought)
+    .map((p) => p.text ?? "")
+    .join("");
+}
+
+async function ask(prompt) {
+  const errors = [];
+  for (const attempt of attempts()) {
+    const label = `${attempt.api}/${attempt.model}/${attempt.search ? "search" : "no-search"}`;
+    const { url, body } = buildRequest(attempt, prompt);
+    let res;
+    try {
+      res = await fetch(url, {
+        method: "POST",
+        headers: { "x-goog-api-key": key, "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(TIMEOUT_MS),
+      });
+    } catch (e) {
+      errors.push(`${label}: ${e.name === "TimeoutError" ? "timeout" : e.message}`);
+      console.log(`✗ ${errors.at(-1)}`);
       continue;
     }
-    console.log(`model=${model} usage=${JSON.stringify(data.usage ?? {})}`);
-    return { text, model };
+    const raw = await res.text();
+    if (!res.ok) {
+      errors.push(`${label}: HTTP ${res.status} ${raw.slice(0, 200)}`);
+      console.log(`✗ ${errors.at(-1)}`);
+      if ([400, 404, 429, 500, 503].includes(res.status)) continue;
+      break; // 401/403 — key problemi, digər cəhdlər də alınmayacaq
+    }
+    const text = extractText(attempt.api, JSON.parse(raw));
+    if (!text.trim()) {
+      errors.push(`${label}: boş cavab`);
+      console.log(`✗ ${errors.at(-1)}`);
+      continue;
+    }
+    console.log(`✓ ${label}`);
+    return { text, model: label };
   }
   throw new Error(errors.join("\n"));
 }
