@@ -33,6 +33,7 @@ jobs:
     timeout-minutes: 15
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GEMINI_CLI_TRUST_WORKSPACE: "true"   # headless CI: Gemini CLI qovluğa etibar etsin
       ISSUE: ${{ github.event.issue.number }}
     steps:
       - uses: actions/checkout@v6.1.0

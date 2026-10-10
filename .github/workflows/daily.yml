@@ -22,6 +22,8 @@ jobs:
   daily:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    env:
+      GEMINI_CLI_TRUST_WORKSPACE: "true"   # headless CI: Gemini CLI qovluğa etibar etsin
     steps:
       - uses: actions/checkout@v6.1.0
 
