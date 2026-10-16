@@ -6,3 +6,4 @@
 | 2026-10-12 | Spring AI ilə Structured Output və JSON Schema Enforcement | Spring AI | Orta | [daily/2026-10-12-spring-ai-structured-output-json-schema.md](daily/2026-10-12-spring-ai-structured-output-json-schema.md) |
 | 2026-10-13 | Spring AI ilə Tool / Function Calling mexanizmi | Spring AI | Orta | [daily/2026-10-13-spring-ai-tool-function-calling.md](daily/2026-10-13-spring-ai-tool-function-calling.md) |
 | 2026-10-14 | Spring AI Chat Memory və Söhbət Tarixçəsinin İdarə Edilməsi (Advisors) | Spring AI | Orta | [daily/2026-10-14-spring-ai-chat-memory-advisors.md](daily/2026-10-14-spring-ai-chat-memory-advisors.md) |
+| 2026-10-16 | Spring AI Embeddings və pgvector İnteqrasiyası | Vector DB | Orta | [daily/2026-10-16-2026-10-16-spring-ai-embeddings-pgvector.md](daily/2026-10-16-2026-10-16-spring-ai-embeddings-pgvector.md) |
