@@ -8,3 +8,4 @@
 | 2026-10-14 | Spring AI Chat Memory və Söhbət Tarixçəsinin İdarə Edilməsi (Advisors) | Spring AI | Orta | [daily/2026-10-14-spring-ai-chat-memory-advisors.md](daily/2026-10-14-spring-ai-chat-memory-advisors.md) |
 | 2026-10-16 | Spring AI Embeddings və pgvector İnteqrasiyası | Vector DB | Orta | [daily/2026-10-16-2026-10-16-spring-ai-embeddings-pgvector.md](daily/2026-10-16-2026-10-16-spring-ai-embeddings-pgvector.md) |
 | 2026-10-17 | Spring AI ilə RAG və ETL Pipeline | RAG | Orta | [daily/2026-10-17-spring-ai-rag-etl-pipeline.md](daily/2026-10-17-spring-ai-rag-etl-pipeline.md) |
+| 2026-10-18 | Model Context Protocol (MCP) Java SDK və Spring AI İnteqrasiyası | MCP | Orta | [daily/2026-10-18-spring-ai-mcp-model-context-protocol.md](daily/2026-10-18-spring-ai-mcp-model-context-protocol.md) |
