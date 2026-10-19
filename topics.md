@@ -9,3 +9,4 @@
 | 2026-10-16 | Spring AI Embeddings və pgvector İnteqrasiyası | Vector DB | Orta | [daily/2026-10-16-2026-10-16-spring-ai-embeddings-pgvector.md](daily/2026-10-16-2026-10-16-spring-ai-embeddings-pgvector.md) |
 | 2026-10-17 | Spring AI ilə RAG və ETL Pipeline | RAG | Orta | [daily/2026-10-17-spring-ai-rag-etl-pipeline.md](daily/2026-10-17-spring-ai-rag-etl-pipeline.md) |
 | 2026-10-18 | Model Context Protocol (MCP) Java SDK və Spring AI İnteqrasiyası | MCP | Orta | [daily/2026-10-18-spring-ai-mcp-model-context-protocol.md](daily/2026-10-18-spring-ai-mcp-model-context-protocol.md) |
+| 2026-10-19 | Spring AI ilə Observability, Token İdarəsi və Distributed Tracing (Micrometer & OpenTelemetry) | Observability | Qabaqcıl | [daily/2026-10-19-spring-ai-observability-micrometer-opentelemetry.md](daily/2026-10-19-spring-ai-observability-micrometer-opentelemetry.md) |
