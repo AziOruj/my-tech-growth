@@ -10,3 +10,4 @@
 | 2026-10-17 | Spring AI ilə RAG və ETL Pipeline | RAG | Orta | [daily/2026-10-17-spring-ai-rag-etl-pipeline.md](daily/2026-10-17-spring-ai-rag-etl-pipeline.md) |
 | 2026-10-18 | Model Context Protocol (MCP) Java SDK və Spring AI İnteqrasiyası | MCP | Orta | [daily/2026-10-18-spring-ai-mcp-model-context-protocol.md](daily/2026-10-18-spring-ai-mcp-model-context-protocol.md) |
 | 2026-10-19 | Spring AI ilə Observability, Token İdarəsi və Distributed Tracing (Micrometer & OpenTelemetry) | Observability | Qabaqcıl | [daily/2026-10-19-spring-ai-observability-micrometer-opentelemetry.md](daily/2026-10-19-spring-ai-observability-micrometer-opentelemetry.md) |
+| 2026-10-20 | Spring AI Təhlükəsizliyi: Prompt Injection Qorunması, PII Maskalanması və Guardrails | Təhlükəsizlik | Qabaqcıl | [daily/2026-10-20-2026-10-20-spring-ai-guardrails-prompt-injection-pii.md](daily/2026-10-20-2026-10-20-spring-ai-guardrails-prompt-injection-pii.md) |
