@@ -13,3 +13,4 @@
 | 2026-10-20 | Spring AI Təhlükəsizliyi: Prompt Injection Qorunması, PII Maskalanması və Guardrails | Təhlükəsizlik | Qabaqcıl | [daily/2026-10-20-2026-10-20-spring-ai-guardrails-prompt-injection-pii.md](daily/2026-10-20-2026-10-20-spring-ai-guardrails-prompt-injection-pii.md) |
 | 2026-10-21 | AI Modellərinin və RAG Cavablarının Qiymətləndirilməsi (Evaluation) | Evaluation / Testing | Qabaqcıl | [daily/2026-10-21-ai-model-evaluation-test-strategies.md](daily/2026-10-21-ai-model-evaluation-test-strategies.md) |
 | 2026-10-22 | Spring AI ilə AI Agentləri və ReAct Workflow-ları | AI Agents / Workflows | Qabaqcıl | [daily/2026-10-22-spring-ai-agents-react-workflows.md](daily/2026-10-22-spring-ai-agents-react-workflows.md) |
+| 2026-10-23 | Semantic Caching (Redis + Spring AI) | Performance & Cost Optimization | Qabaqcıl | [daily/2026-10-23-2026-10-23-semantic-caching-spring-ai-redis.md](daily/2026-10-23-2026-10-23-semantic-caching-spring-ai-redis.md) |
