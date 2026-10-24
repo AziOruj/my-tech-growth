@@ -14,3 +14,4 @@
 | 2026-10-21 | AI Modellərinin və RAG Cavablarının Qiymətləndirilməsi (Evaluation) | Evaluation / Testing | Qabaqcıl | [daily/2026-10-21-ai-model-evaluation-test-strategies.md](daily/2026-10-21-ai-model-evaluation-test-strategies.md) |
 | 2026-10-22 | Spring AI ilə AI Agentləri və ReAct Workflow-ları | AI Agents / Workflows | Qabaqcıl | [daily/2026-10-22-spring-ai-agents-react-workflows.md](daily/2026-10-22-spring-ai-agents-react-workflows.md) |
 | 2026-10-23 | Semantic Caching (Redis + Spring AI) | Performance & Cost Optimization | Qabaqcıl | [daily/2026-10-23-2026-10-23-semantic-caching-spring-ai-redis.md](daily/2026-10-23-2026-10-23-semantic-caching-spring-ai-redis.md) |
+| 2026-10-24 | Spring AI Streaming və Virtual Threads ilə High-Throughput LLM Sistemləri | Performance & Concurrency | Qabaqcıl | [daily/2026-10-24-2026-10-24-spring-ai-streaming-virtual-threads-concurrency.md](daily/2026-10-24-2026-10-24-spring-ai-streaming-virtual-threads-concurrency.md) |
