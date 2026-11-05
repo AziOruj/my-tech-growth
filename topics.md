@@ -25,3 +25,4 @@
 | 2026-11-02 | Spring AI Custom Advisors: Müəssisə Səviyyəli Məntiqin İdarə Edilməsi | Spring AI / Architecture | Qabaqcıl | [daily/2026-11-02-spring-ai-custom-advisors-enterprise-logic.md](daily/2026-11-02-spring-ai-custom-advisors-enterprise-logic.md) |
 | 2026-11-03 | Spring AI Multi-modal: Vision (Şəkil Analizi) İnteqrasiyası | Multi-modal AI | Orta | [daily/2026-11-03-spring-ai-multi-modal-vision-processing.md](daily/2026-11-03-spring-ai-multi-modal-vision-processing.md) |
 | 2026-11-04 | Spring AI: Hybrid Search və Metadata Filtering | Vector DB / RAG | Qabaqcıl | [daily/2026-11-04-spring-ai-hybrid-search-metadata-filtering.md](daily/2026-11-04-spring-ai-hybrid-search-metadata-filtering.md) |
+| 2026-11-05 | Spring AI: Multi-Agent Systems & Orchestration | AI Agents / Architecture | Qabaqcıl | [daily/2026-11-05-spring-ai-multi-agent-orchestration-strategies.md](daily/2026-11-05-spring-ai-multi-agent-orchestration-strategies.md) |
