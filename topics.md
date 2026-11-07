@@ -27,3 +27,4 @@
 | 2026-11-04 | Spring AI: Hybrid Search və Metadata Filtering | Vector DB / RAG | Qabaqcıl | [daily/2026-11-04-spring-ai-hybrid-search-metadata-filtering.md](daily/2026-11-04-spring-ai-hybrid-search-metadata-filtering.md) |
 | 2026-11-05 | Spring AI: Multi-Agent Systems & Orchestration | AI Agents / Architecture | Qabaqcıl | [daily/2026-11-05-spring-ai-multi-agent-orchestration-strategies.md](daily/2026-11-05-spring-ai-multi-agent-orchestration-strategies.md) |
 | 2026-11-06 | Spring AI: Reflection və Self-Correction Workflow-ları | AI Agents / Design Patterns | Qabaqcıl | [daily/2026-11-06-spring-ai-reflection-self-correction-pattern.md](daily/2026-11-06-spring-ai-reflection-self-correction-pattern.md) |
+| 2026-11-07 | Spring AI: GraphRAG və Knowledge Graph İnteqrasiyası | RAG / Architecture | Qabaqcıl | [daily/2026-11-07-spring-ai-graph-rag-knowledge-graph.md](daily/2026-11-07-spring-ai-graph-rag-knowledge-graph.md) |
