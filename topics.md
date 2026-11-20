@@ -37,3 +37,4 @@
 | 2026-11-15 | Spring AI: Tool Calling Reliability və Accuracy Testing | Testing & Evaluation | Qabaqcıl | [daily/2026-11-15-spring-ai-tool-calling-reliability-evaluators.md](daily/2026-11-15-spring-ai-tool-calling-reliability-evaluators.md) |
 | 2026-11-18 | Spring AI: Human-in-the-loop (HITL) və Manual Approval | AI Agents / Architecture | Qabaqcıl | [daily/2026-11-18-spring-ai-human-in-the-loop-hitl-workflows.md](daily/2026-11-18-spring-ai-human-in-the-loop-hitl-workflows.md) |
 | 2026-11-19 | Spring AI: Text-to-SQL və Verilənlər Bazası İnteqrasiyası | RAG / Database | Qabaqcıl | [daily/2026-11-19-spring-ai-text-to-sql-enterprise-data.md](daily/2026-11-19-spring-ai-text-to-sql-enterprise-data.md) |
+| 2026-11-20 | Spring AI: Semantic Routing (Ağıllı Sorğu Marşrutlaşdırma) | Architecture / RAG | Qabaqcıl | [daily/2026-11-20-spring-ai-semantic-routing-query-dispatching.md](daily/2026-11-20-spring-ai-semantic-routing-query-dispatching.md) |
