@@ -42,3 +42,4 @@
 | 2026-11-22 | Spring AI: Self-RAG (Self-Reflective RAG) Pattern | RAG / Advanced Architecture | Qabaqcıl | [daily/2026-11-22-spring-ai-self-rag-reflection-cycle.md](daily/2026-11-22-spring-ai-self-rag-reflection-cycle.md) |
 | 2026-11-25 | Spring AI: Adaptive RAG Orchestration | RAG / AI Agents | Qabaqcıl | [daily/2026-11-25-spring-ai-adaptive-rag-orchestration.md](daily/2026-11-25-spring-ai-adaptive-rag-orchestration.md) |
 | 2026-11-26 | Spring AI: MCP Server Development | MCP / Architecture | Qabaqcıl | [daily/2026-11-26-spring-ai-mcp-server-development.md](daily/2026-11-26-spring-ai-mcp-server-development.md) |
+| 2026-11-27 | Spring AI: Long-term Entity Memory (Fərdi Süni İntellekt Təcrübəsi) | AI Agents / Personalization | Qabaqcıl | [daily/2026-11-27-spring-ai-long-term-entity-memory.md](daily/2026-11-27-spring-ai-long-term-entity-memory.md) |
